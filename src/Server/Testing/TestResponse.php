@@ -197,6 +197,22 @@ class TestResponse
         return $this->assertHasNoErrors();
     }
 
+    public function assertNotRegistered(): static
+    {
+        [$primitiveType, $primitiveIdentifier] = match (true) {
+            $this->primitive instanceof Tool => ['tool', $this->primitive->name()],
+            $this->primitive instanceof Prompt => ['prompt', $this->primitive->name()],
+            $this->primitive instanceof Resource => ['resource', $this->primitive->uri()],
+        };
+
+        Assert::assertTrue(
+            count(array_filter($this->errors(), fn ($error) => str_contains($error, ucfirst($primitiveType).' ['.$primitiveIdentifier.'] not found.'))) > 0,
+            'The '.$primitiveType.' ['. get_class($this->primitive) .'] is registered.',
+        );
+
+        return $this;
+    }
+
     public function assertHasNoErrors(): static
     {
         Assert::assertSame([], $this->errors(), 'The response has errors.');
