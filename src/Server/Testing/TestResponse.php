@@ -206,8 +206,8 @@ class TestResponse
         };
 
         Assert::assertTrue(
-            count(array_filter($this->errors(), fn ($error) => str_contains($error, ucfirst($primitiveType).' ['.$primitiveIdentifier.'] not found.'))) > 0,
-            'The '.$primitiveType.' ['. get_class($this->primitive) .'] is registered.',
+            count(array_filter($this->errors(), fn (string $error): bool => str_contains($error, ucfirst($primitiveType).' ['.$primitiveIdentifier.'] not found.'))) > 0,
+            'The '.$primitiveType.' ['.$this->primitive::class.'] is registered.',
         );
 
         return $this;
