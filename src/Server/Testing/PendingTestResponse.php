@@ -64,6 +64,38 @@ class PendingTestResponse
         return new TestListResponse($tools);
     }
 
+    public function resources(): TestListResponse
+    {
+        $server = $this->initializeServer();
+        $resources = [];
+        $cursor = null;
+
+        do {
+            $request = new JsonRpcRequest(
+                uniqid(),
+                'resources/list',
+                $cursor !== null ? ['cursor' => $cursor] : [],
+            );
+
+            $response = $this->executeRequest($server, $request);
+
+            if (! $response instanceof JsonRpcResponse) {
+                throw new InvalidArgumentException('Expected a JsonRpcResponse for [resources/list].');
+            }
+
+            $result = $response->toArray()['result'] ?? null;
+
+            if (! is_array($result) || ! is_array($result['resources'] ?? null)) {
+                throw new InvalidArgumentException('Invalid resources/list response from server.');
+            }
+
+            $resources = [...$resources, ...$result['resources']];
+            $cursor = is_string($result['nextCursor'] ?? null) ? $result['nextCursor'] : null;
+        } while ($cursor !== null);
+
+        return new TestListResponse($resources);
+    }
+
     /**
      * @param  class-string<Tool>|Tool  $tool
      * @param  array<string, mixed>  $arguments
