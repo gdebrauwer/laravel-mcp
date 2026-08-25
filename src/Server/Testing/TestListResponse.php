@@ -28,8 +28,9 @@ class TestListResponse
     public function assertRegistered(array|string $classes): static
     {
         $itemNames = Arr::pluck($this->items, 'name');
+        $classes = is_array($classes) ? $classes : [$classes];
 
-        foreach (Arr::wrap($classes) as $class) {
+        foreach ($classes as $class) {
             $name = (new $class)->name();
 
             Assert::assertContains($name, $itemNames, "The expected class [{$class}] was not found in the response content.");
@@ -47,8 +48,9 @@ class TestListResponse
     public function assertNotRegistered(array|string $classes): static
     {
         $itemNames = Arr::pluck($this->items, 'name');
+        $classes = is_array($classes) ? $classes : [$classes];
 
-        foreach (Arr::wrap($classes) as $class) {
+        foreach ($classes as $class) {
             $name = (new $class)->name();
 
             Assert::assertNotContains($name, $itemNames, "The expected class [{$class}] was found in the response content.");
