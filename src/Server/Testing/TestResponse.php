@@ -203,6 +203,7 @@ class TestResponse
             $this->primitive instanceof Tool => ['tool', $this->primitive->name()],
             $this->primitive instanceof Prompt => ['prompt', $this->primitive->name()],
             $this->primitive instanceof Resource => ['resource', $this->primitive->uri()],
+            default => throw new RuntimeException('This primitive type is not supported.'),
         };
 
         Assert::assertTrue(
