@@ -43,24 +43,25 @@ class TireRotationPrompt extends Prompt
     }
 }
 
-it('asserts registered prompts of a server', function (): void {
+it('may assert that prompts are registered on a server', function (): void {
+    OilChangePrompt::$shouldRegister = true;
+
     GarageListPromptsServer::prompts()->assertRegistered([
         OilChangePrompt::class,
         TireRotationPrompt::class,
     ]);
+});
 
-    try {
-        GarageListPromptsServer::prompts()->assertRegistered([
-            TireRotationPrompt::class,
-        ])->assertNotRegistered([
-            OilChangePrompt::class,
-        ]);
+it('may fail to assert that prompts are registered on a server', function (): void {
+    OilChangePrompt::$shouldRegister = false;
 
-        $this->fail('Expected an AssertionFailedError to be thrown, but it was not.');
-    } catch (AssertionFailedError $error) {
-        expect($error->getMessage())->toContain('The expected class ['.OilChangePrompt::class.'] was found in the response content.');
-    }
+    GarageListPromptsServer::prompts()->assertRegistered([
+        TireRotationPrompt::class,
+        OilChangePrompt::class,
+    ]);
+})->throws(AssertionFailedError::class, 'The expected class ['.OilChangePrompt::class.'] was not found in the response content.');
 
+it('may assert that prompts are not registered on a server', function (): void {
     OilChangePrompt::$shouldRegister = false;
 
     GarageListPromptsServer::prompts()->assertRegistered([
@@ -68,15 +69,14 @@ it('asserts registered prompts of a server', function (): void {
     ])->assertNotRegistered([
         OilChangePrompt::class,
     ]);
-
-    try {
-        GarageListPromptsServer::prompts()->assertRegistered([
-            TireRotationPrompt::class,
-            OilChangePrompt::class,
-        ]);
-
-        $this->fail('Expected an AssertionFailedError to be thrown, but it was not.');
-    } catch (AssertionFailedError $error) {
-        expect($error->getMessage())->toContain('The expected class ['.OilChangePrompt::class.'] was not found in the response content.');
-    }
 });
+
+it('may fail to assert that prompts are not registered on a server', function (): void {
+    OilChangePrompt::$shouldRegister = true;
+
+    GarageListPromptsServer::prompts()->assertRegistered([
+        TireRotationPrompt::class,
+    ])->assertNotRegistered([
+        OilChangePrompt::class,
+    ]);
+})->throws(AssertionFailedError::class, 'The expected class ['.OilChangePrompt::class.'] was found in the response content.');

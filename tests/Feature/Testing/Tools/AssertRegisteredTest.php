@@ -43,24 +43,25 @@ class TireRotationTool extends Tool
     }
 }
 
-it('asserts registered tools of a server', function (): void {
+it('may assert that tools are registered on a server', function (): void {
+    OilChangeTool::$shouldRegister = true;
+
     GarageListToolsServer::tools()->assertRegistered([
         OilChangeTool::class,
         TireRotationTool::class,
     ]);
+});
 
-    try {
-        GarageListToolsServer::tools()->assertRegistered([
-            TireRotationTool::class,
-        ])->assertNotRegistered([
-            OilChangeTool::class,
-        ]);
+it('may fail to assert that tools are registered on a server', function (): void {
+    OilChangeTool::$shouldRegister = false;
 
-        $this->fail('Expected an AssertionFailedError to be thrown, but it was not.');
-    } catch (AssertionFailedError $error) {
-        expect($error->getMessage())->toContain('The expected class ['.OilChangeTool::class.'] was found in the response content.');
-    }
+    GarageListToolsServer::tools()->assertRegistered([
+        TireRotationTool::class,
+        OilChangeTool::class,
+    ]);
+})->throws(AssertionFailedError::class, 'The expected class ['.OilChangeTool::class.'] was not found in the response content.');
 
+it('may assert that tools are not registered on a server', function (): void {
     OilChangeTool::$shouldRegister = false;
 
     GarageListToolsServer::tools()->assertRegistered([
@@ -68,15 +69,14 @@ it('asserts registered tools of a server', function (): void {
     ])->assertNotRegistered([
         OilChangeTool::class,
     ]);
-
-    try {
-        GarageListToolsServer::tools()->assertRegistered([
-            TireRotationTool::class,
-            OilChangeTool::class,
-        ]);
-
-        $this->fail('Expected an AssertionFailedError to be thrown, but it was not.');
-    } catch (AssertionFailedError $error) {
-        expect($error->getMessage())->toContain('The expected class ['.OilChangeTool::class.'] was not found in the response content.');
-    }
 });
+
+it('may fail to assert that tools are not registered on a server', function (): void {
+    OilChangeTool::$shouldRegister = true;
+
+    GarageListToolsServer::tools()->assertRegistered([
+        TireRotationTool::class,
+    ])->assertNotRegistered([
+        OilChangeTool::class,
+    ]);
+})->throws(AssertionFailedError::class, 'The expected class ['.OilChangeTool::class.'] was found in the response content.');
