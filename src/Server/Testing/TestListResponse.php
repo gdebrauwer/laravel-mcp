@@ -7,6 +7,7 @@ namespace Laravel\Mcp\Server\Testing;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
+use Laravel\Mcp\Server\Primitive;
 use PHPUnit\Framework\Assert;
 
 class TestListResponse
@@ -14,12 +15,15 @@ class TestListResponse
     use Conditionable;
     use Macroable;
 
+    /**
+     * @param  array<int, array<string, mixed>>  $items
+     */
     public function __construct(
         protected array $items,
     ) {}
 
     /**
-     * @param  array<class-string>|class-string  $classes
+     * @param  array<class-string<Primitive>>|class-string<Primitive>  $classes
      */
     public function assertRegistered(array|string $classes): static
     {
@@ -38,7 +42,7 @@ class TestListResponse
     }
 
     /**
-     * @param  array<class-string>|class-string  $classes
+     * @param  array<class-string<Primitive>>|class-string<Primitive>  $classes
      */
     public function assertNotRegistered(array|string $classes): static
     {
