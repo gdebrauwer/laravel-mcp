@@ -1,0 +1,70 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Laravel\Mcp\Server\Testing;
+
+use Illuminate\Support\Arr;
+use Illuminate\Support\Traits\Conditionable;
+use Illuminate\Support\Traits\Macroable;
+use PHPUnit\Framework\Assert;
+
+class TestListResponse
+{
+    use Conditionable;
+    use Macroable;
+
+    public function __construct(
+        protected array $items,
+    ) {}
+
+    /**
+     * @param  array<class-string>|class-string  $classes
+     */
+    public function assertRegistered(array|string $classes): static
+    {
+        $itemNames = Arr::pluck($this->items, 'name');
+
+        foreach (Arr::wrap($classes) as $class) {
+            $name = (new $class)->name();
+
+            Assert::assertContains($name, $itemNames, "The expected class [{$class}] was not found in the response content.");
+        }
+
+        // @phpstan-ignore-next-line
+        Assert::assertTrue(true);
+
+        return $this;
+    }
+
+    /**
+     * @param  array<class-string>|class-string  $classes
+     */
+    public function assertNotRegistered(array|string $classes): static
+    {
+        $itemNames = Arr::pluck($this->items, 'name');
+
+        foreach (Arr::wrap($classes) as $class) {
+            $name = (new $class)->name();
+
+            Assert::assertNotContains($name, $itemNames, "The expected class [{$class}] was found in the response content.");
+        }
+
+        // @phpstan-ignore-next-line
+        Assert::assertTrue(true);
+
+        return $this;
+    }
+
+    public function dd(): void
+    {
+        dd($this->items);
+    }
+
+    public function dump(): static
+    {
+        dump($this->items);
+
+        return $this;
+    }
+}
