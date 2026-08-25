@@ -43,24 +43,25 @@ class TireRotationResource extends Resource
     }
 }
 
-it('asserts registered resources of a server', function (): void {
+it('may assert that resources are registered on a server', function (): void {
+    OilChangeResource::$shouldRegister = true;
+
     GarageListResourcesServer::resources()->assertRegistered([
         OilChangeResource::class,
         TireRotationResource::class,
     ]);
+});
 
-    try {
-        GarageListResourcesServer::resources()->assertRegistered([
-            TireRotationResource::class,
-        ])->assertNotRegistered([
-            OilChangeResource::class,
-        ]);
+it('may fail to assert that resources are registered on a server', function (): void {
+    OilChangeResource::$shouldRegister = false;
 
-        $this->fail('Expected an AssertionFailedError to be thrown, but it was not.');
-    } catch (AssertionFailedError $error) {
-        expect($error->getMessage())->toContain('The expected class ['.OilChangeResource::class.'] was found in the response content.');
-    }
+    GarageListResourcesServer::resources()->assertRegistered([
+        TireRotationResource::class,
+        OilChangeResource::class,
+    ]);
+})->throws(AssertionFailedError::class, 'The expected class ['.OilChangeResource::class.'] was not found in the response content.');
 
+it('may assert that resources are not registered on a server', function (): void {
     OilChangeResource::$shouldRegister = false;
 
     GarageListResourcesServer::resources()->assertRegistered([
@@ -68,15 +69,16 @@ it('asserts registered resources of a server', function (): void {
     ])->assertNotRegistered([
         OilChangeResource::class,
     ]);
-
-    try {
-        GarageListResourcesServer::resources()->assertRegistered([
-            TireRotationResource::class,
-            OilChangeResource::class,
-        ]);
-
-        $this->fail('Expected an AssertionFailedError to be thrown, but it was not.');
-    } catch (AssertionFailedError $error) {
-        expect($error->getMessage())->toContain('The expected class ['.OilChangeResource::class.'] was not found in the response content.');
-    }
 });
+
+it('may fail to assert that resources are not registered on a server', function (): void {
+    OilChangeResource::$shouldRegister = true;
+
+    GarageListResourcesServer::resources()->assertRegistered([
+        TireRotationResource::class,
+    ])->assertNotRegistered([
+        OilChangeResource::class,
+    ]);
+
+    $this->fail('Expected an AssertionFailedError to be thrown, but it was not.');
+})->throws(AssertionFailedError::class, 'The expected class ['.OilChangeResource::class.'] was found in the response content.');
