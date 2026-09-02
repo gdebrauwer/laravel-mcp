@@ -86,7 +86,7 @@ class Argument implements ContextualAttribute
     private static function resolveReflectionParameter(): ?ReflectionParameter
     {
         foreach (debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT) as $frame) {
-            if (($frame['class'] ?? null) !== 'Illuminate\\Container\\BoundMethod') {
+            if (($frame['class'] ?? null) !== \Illuminate\Container\BoundMethod::class) {
                 continue;
             }
 
