@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Laravel\Mcp\Attributes;
 
 use Attribute;
+use Illuminate\Container\BoundMethod;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Container\ContextualAttribute;
 use Illuminate\Database\Eloquent\Model;
@@ -86,7 +87,7 @@ class Argument implements ContextualAttribute
     private static function resolveReflectionParameter(): ?ReflectionParameter
     {
         foreach (debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT) as $frame) {
-            if (($frame['class'] ?? null) !== \Illuminate\Container\BoundMethod::class) {
+            if (($frame['class'] ?? null) !== BoundMethod::class) {
                 continue;
             }
 
