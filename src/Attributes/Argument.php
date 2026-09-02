@@ -13,14 +13,21 @@ use Illuminate\Validation\ValidationException;
 use Laravel\Mcp\Request;
 use ReflectionNamedType;
 use ReflectionParameter;
+use RuntimeException;
 
 #[Attribute(Attribute::TARGET_PARAMETER)]
 class Argument implements ContextualAttribute
 {
     public function __construct(public ?string $name = null) {}
 
-    public static function resolve(self $attribute, Container $container, ReflectionParameter $parameter): mixed
+    public static function resolve(self $attribute, Container $container, ?ReflectionParameter $parameter = null): mixed
     {
+        $parameter ??= self::resolveReflectionParameter();
+
+        if (! $parameter instanceof ReflectionParameter) {
+            throw new RuntimeException('Unable to resolve the reflected parameter for the [Argument] attribute.');
+        }
+
         /** @var Request $request */
         $request = $container->make(Request::class);
         $type = $parameter->getType();
@@ -74,5 +81,26 @@ class Argument implements ContextualAttribute
         }
 
         return $resolved;
+    }
+
+    private static function resolveReflectionParameter(): ?ReflectionParameter
+    {
+        foreach (debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT) as $frame) {
+            if (($frame['class'] ?? null) !== 'Illuminate\\Container\\BoundMethod') {
+                continue;
+            }
+
+            if (($frame['function'] ?? null) !== 'addDependencyForCallParameter') {
+                continue;
+            }
+
+            $parameter = $frame['args'][1] ?? null;
+
+            if ($parameter instanceof ReflectionParameter) {
+                return $parameter;
+            }
+        }
+
+        return null;
     }
 }

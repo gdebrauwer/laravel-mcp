@@ -52,13 +52,9 @@ beforeEach(function (): void {
 });
 
 it('resolves scalar arguments by attribute key for tools', function (): void {
-    $tool = ArgumentAttributeServer::tool(ArgumentAttributeScalarTool::class, [
+    ArgumentAttributeServer::tool(ArgumentAttributeScalarTool::class, [
         'meeting_id' => 'abc-123',
-    ]);
-
-    dump($tool);
-
-    $tool->assertSee('Meeting ID: abc-123');
+    ])->assertSee('Meeting ID: abc-123');
 });
 
 it('resolves eloquent models by attribute key for tools', function (): void {
