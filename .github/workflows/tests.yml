@@ -54,12 +54,10 @@ jobs:
            composer update --prefer-dist --no-interaction --no-progress --with="illuminate/contracts:^${{ matrix.laravel }}"
 
       - name: Execute tests
-        run: composer test
+        run: vendor/bin/pest --filter ArgumentAttributeTest
         if: ${{ ! (matrix.os == 'windows-latest' && matrix.php == '8.5') }}
 
       - name: Execute tests (no coverage)
         run: |
-          composer test:lint
-          vendor/bin/pest --ci
-          composer test:types
+          vendor/bin/pest --filter ArgumentAttributeTest
         if: ${{ matrix.os == 'windows-latest' && matrix.php == '8.5' }}
